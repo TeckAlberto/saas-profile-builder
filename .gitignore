@@ -1,0 +1,36 @@
+# Logs
+# (Estas ya funcionaban para ambas carpetas)
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencias y carpetas de 'build'
+# Añadimos la '/' al final para ignorar solo carpetas
+node_modules/
+dist/
+dist-ssr/
+
+# Archivos locales (ej. .env.local)
+# (Esta ya funcionaba para ambas carpetas)
+*.local
+
+# Editor directories and files
+# Cambiamos '.vscode/*' por '.vscode/' para que aplique
+# a CUALQUIER carpeta .vscode (en raíz, client, server, etc.)
+.vscode/
+
+# Esta excepción SÍ funcionará para el .vscode/ de la raíz
+!.vscode/extensions.json
+
+# (Estas ya funcionaban para ambas carpetas)
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

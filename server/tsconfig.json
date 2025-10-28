@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    /* Paths de entrada y salida */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Compatibilidad del lenguaje */
+    "target": "ES2022", // Buen soporte de funcionalidades modernas
+    "module": "ESNext", // Permite tree-shaking con bundlers modernos
+    "lib": ["ESNext"], // Soporte navegador y moderno
+    // tal vez se nesecite esto: pnpm add -D @types/node
+
+    /* Interoperabilidad con CommonJS */
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* Verificación estricta y seguridad */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* Salidas opcionales */
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* React */
+    "jsx": "react-jsx",
+
+    /* Otros ajustes recomendados */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true
+  },
+
+  /* Archivos del proyecto */
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
