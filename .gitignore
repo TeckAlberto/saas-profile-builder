@@ -8,12 +8,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+
 # Dependencias y carpetas de 'build'
 # Añadimos la '/' al final para ignorar solo carpetas
 node_modules/
 dist/
 dist-ssr/
-
+server/.env
+client/.env
+server/coverage
 # Archivos locales (ej. .env.local)
 # (Esta ya funcionaba para ambas carpetas)
 *.local
