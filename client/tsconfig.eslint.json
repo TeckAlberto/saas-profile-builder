@@ -1,0 +1,13 @@
+{
+  // 1. Heredar toda la configuración del principal
+  "extends": "./tsconfig.json",
+
+  // 2. Sobrescribir "include" para añadir los tests y configs
+  "include": [
+    "src",
+    "test", // <-- Añadir tu carpeta de tests
+    "vite.config.ts", // <-- Lintar tu config de Vite
+    "eslint.config.js" // <-- Lintar tu config de ESLint
+  ],
+  "exclude": ["node_modules", "dist"]
+}

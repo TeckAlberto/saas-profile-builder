@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { type Request, type Response } from 'express'
 import bcrypt from 'bcryptjs'
+
 import db from '../../../src/db'
 import register from '../../../src/controllers/auth/register'
 
@@ -23,14 +24,14 @@ const mockBcryptHash = vi.spyOn(bcrypt, 'hash')
 let mockRequest: Partial<Request>
 let mockResponse: Partial<Response>
 let mockStatus: Mock<(statusCode: number) => Response>
-let mockSend: Mock<(body: any) => Response>
+let mockSend: Mock<(body: unknown) => Response>
 
 beforeEach(() => {
   vi.clearAllMocks()
 
   mockResponse = {} as Partial<Response>
 
-  mockSend = vi.fn((_body: any) => {
+  mockSend = vi.fn((_body: unknown) => {
     return mockResponse as Response
   })
   mockStatus = vi.fn((_statusCode: number) => {
@@ -88,7 +89,7 @@ describe('controller', () => {
         ['test@example.com', 'testuser', 'mocked_hashed_password']
       )
 
-      expect(mockResponse.status).not.toHaveBeenCalled()
+      expect(mockResponse.status).toHaveBeenCalledWith(201)
       expect(mockSend).toHaveBeenCalledWith(nuevoUsuario)
     })
 

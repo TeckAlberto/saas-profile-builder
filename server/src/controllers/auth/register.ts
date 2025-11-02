@@ -1,9 +1,16 @@
 import { type Request, type Response } from 'express'
 import bcrypt from 'bcryptjs'
+
 import db from '../../db'
 
+interface RegisterRequestBody {
+  email: string
+  username: string
+  password: string
+}
+
 const register = async (req: Request, res: Response) => {
-  const { email, username, password } = req.body
+  const { email, username, password } = req.body as RegisterRequestBody
 
   if (!email || !username || !password) {
     return res.status(400).send({ message: 'Email, username, and password are required' })
@@ -32,7 +39,7 @@ const register = async (req: Request, res: Response) => {
     }
     console.log('Registering user with email:', email, 'and username:', username)
 
-    res.send(result.rows[0])
+    res.status(201).send(result.rows[0])
   } catch (error) {
     console.error('Error en el controlador de registro:', (error as Error).message)
 
