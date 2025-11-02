@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState /*, useEffect*/ } from 'react' // <--- Comentamos useEffect
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const [data, setData] = useState<string | null>(null)
+  // const [data, setData] = useState<string | null>(null) // <--- Comentamos esto
 
   // Example of fetching data from the backend
+  /* // <--- Comentamos todo el bloque
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,9 +24,12 @@ function App() {
     setData('Loading...')
     fetchData()
   }, [])
+  */ // <--- Fin del bloque comentado
 
   return (
-    <>
+    // --- CAMBIO AQUÍ ---
+    // Añade el data-testid al elemento raíz
+    <main data-testid="app-root">
       <div>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -42,7 +46,7 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    </main> // <-- Cierra el <main>
   )
 }
 

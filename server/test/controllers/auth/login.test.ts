@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { type Request, type Response } from 'express'
 import bcrypt from 'bcryptjs'
-import db from '../../../src/db'
 import j from 'jsonwebtoken'
 
+import db from '../../../src/db'
 import login from '../../../src/controllers/auth/login'
 
 vi.mock('../../../src/db', () => ({
@@ -31,14 +31,14 @@ const mockJwtSign = vi.spyOn(j, 'sign')
 let mockRequest: Partial<Request>
 let mockResponse: Partial<Response>
 let mockStatus: Mock<(statusCode: number) => Response>
-let mockSend: Mock<(body: any) => Response>
+let mockSend: Mock<(body: unknown) => Response>
 
 beforeEach(() => {
   vi.clearAllMocks()
 
   mockResponse = {} as Partial<Response>
 
-  mockSend = vi.fn((_body: any) => {
+  mockSend = vi.fn((_body: unknown) => {
     return mockResponse as Response
   })
   mockStatus = vi.fn((_statusCode: number) => {
@@ -90,7 +90,7 @@ describe('controller', () => {
         { expiresIn: '1h' }
       )
 
-      expect(mockResponse.status).not.toHaveBeenCalled()
+      expect(mockResponse.status).toHaveBeenCalledWith(200)
       expect(mockSend).toHaveBeenCalledWith(successfulLoginResponse)
     })
 
