@@ -5,11 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react({
-      babel: {
-        plugins: [['babel-plugin-react-compiler']]
-      }
-    }),
+    react(),
     tailwindcss()
   ],
   server: {
@@ -22,6 +18,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: 'jsdom',
+    setupFiles: './src/setup.Tests.ts'
   }
 })
