@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17
+    container_name: saas_profile_builder_db
+    environment:
+      POSTGRES_USER: profile_builder
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: saas_profile_builder_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - saas_profile_builder_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profile_builder -d saas_profile_builder_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  saas_profile_builder_db_data:

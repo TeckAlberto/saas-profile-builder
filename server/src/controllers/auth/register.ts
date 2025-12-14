@@ -1,7 +1,9 @@
 import { type Request, type Response } from 'express'
 import bcrypt from 'bcryptjs'
+import { eq, or } from 'drizzle-orm'
 
-import db from '../../db'
+import { db } from '../../db'
+import { users } from '../../db/schema'
 
 interface RegisterRequestBody {
   email: string
@@ -17,29 +19,30 @@ const register = async (req: Request, res: Response) => {
   }
 
   try {
-    const checkUser = await db.query('SELECT * FROM users WHERE email = $1 OR username = $2', [
-      email,
-      username
-    ])
+    const checkUser = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.email, email), eq(users.username, username)))
+      .limit(1)
 
-    if (checkUser.rows.length > 0) {
+    if (checkUser.length > 0) {
       return res.status(409).send({ message: 'User already exists' })
     }
 
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
-    const result = await db.query(
-      'INSERT INTO users (email, username, password_hash) VALUES ($1, $2, $3) RETURNING id, email, username, plan',
-      [email, username, hashedPassword]
-    )
+    const result = await db
+      .insert(users)
+      .values({ email, username, passwordHash: hashedPassword })
+      .returning({ id: users.id, email: users.email, username: users.username, plan: users.plan })
 
-    if (result.rowCount === 0) {
+    if (result.length === 0) {
       return res.status(500).send({ message: 'Error registering user' })
     }
     console.log('Registering user with email:', email, 'and username:', username)
 
-    res.status(201).send(result.rows[0])
+    res.status(201).send(result[0])
   } catch (error) {
     console.error('Error en el controlador de registro:', (error as Error).message)
 

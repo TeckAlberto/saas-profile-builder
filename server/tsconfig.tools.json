@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "target": "ES2021",
+    "module": "CommonJS",
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["drizzle.config.ts"]
+}

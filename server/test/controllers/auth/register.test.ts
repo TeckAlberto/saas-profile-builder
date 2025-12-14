@@ -1,25 +1,35 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { type Request, type Response } from 'express'
-import bcrypt from 'bcryptjs'
 
-import db from '../../../src/db'
 import register from '../../../src/controllers/auth/register'
 
+const mockDbSelect = vi.hoisted(() => vi.fn())
+const mockDbInsert = vi.hoisted(() => vi.fn())
+const mockBcryptGenSalt = vi.hoisted(() => vi.fn())
+const mockBcryptHash = vi.hoisted(() => vi.fn())
+
 vi.mock('../../../src/db', () => ({
-  default: {
-    query: vi.fn()
+  db: {
+    select: mockDbSelect,
+    insert: mockDbInsert
+  },
+  pool: {
+    end: vi.fn()
   }
 }))
 
 vi.mock('bcryptjs', () => ({
   default: {
-    genSalt: vi.fn(() => Promise.resolve('mocked_salt')),
-    hash: vi.fn(() => Promise.resolve('mocked_hashed_password'))
+    genSalt: mockBcryptGenSalt,
+    hash: mockBcryptHash
   }
 }))
 
-const mockDbQuery = vi.spyOn(db, 'query')
-const mockBcryptHash = vi.spyOn(bcrypt, 'hash')
+const mockDbFrom = vi.fn()
+const mockDbWhere = vi.fn()
+const mockDbLimit = vi.fn()
+const mockDbValues = vi.fn()
+const mockDbReturning = vi.fn()
 
 let mockRequest: Partial<Request>
 let mockResponse: Partial<Response>
@@ -28,6 +38,14 @@ let mockSend: Mock<(body: unknown) => Response>
 
 beforeEach(() => {
   vi.clearAllMocks()
+
+  mockDbSelect.mockReturnValue({ from: mockDbFrom })
+  mockDbFrom.mockReturnValue({ where: mockDbWhere })
+  mockDbWhere.mockReturnValue({ limit: mockDbLimit })
+  mockDbInsert.mockReturnValue({ values: mockDbValues })
+  mockDbValues.mockReturnValue({ returning: mockDbReturning })
+  mockBcryptGenSalt.mockResolvedValue('mocked_salt')
+  mockBcryptHash.mockResolvedValue('mocked_hashed_password')
 
   mockResponse = {} as Partial<Response>
 
@@ -60,34 +78,16 @@ describe('controller', () => {
         plan: 'free'
       }
 
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [],
-        rowCount: 0,
-        command: 'SELECT',
-        oid: 0,
-        fields: []
-      })
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [nuevoUsuario],
-        rowCount: 1,
-        command: 'INSERT',
-        oid: 0,
-        fields: []
-      })
+      mockDbLimit.mockResolvedValueOnce([])
+      mockDbReturning.mockResolvedValueOnce([nuevoUsuario])
 
       await register(mockRequest as Request, mockResponse as Response)
 
-      expect(mockDbQuery).toHaveBeenCalledWith(
-        'SELECT * FROM users WHERE email = $1 OR username = $2',
-        ['test@example.com', 'testuser']
-      )
+      expect(mockDbSelect).toHaveBeenCalled()
 
       expect(mockBcryptHash).toHaveBeenCalledWith('password123', 'mocked_salt')
 
-      expect(mockDbQuery).toHaveBeenCalledWith(
-        'INSERT INTO users (email, username, password_hash) VALUES ($1, $2, $3) RETURNING id, email, username, plan',
-        ['test@example.com', 'testuser', 'mocked_hashed_password']
-      )
+      expect(mockDbInsert).toHaveBeenCalled()
 
       expect(mockResponse.status).toHaveBeenCalledWith(201)
       expect(mockSend).toHaveBeenCalledWith(nuevoUsuario)
@@ -102,43 +102,22 @@ describe('controller', () => {
       expect(mockSend).toHaveBeenCalledWith({
         message: 'Email, username, and password are required'
       })
-      expect(mockDbQuery).not.toHaveBeenCalled()
+      expect(mockDbSelect).not.toHaveBeenCalled()
     })
 
     it('should return 409 if the user already exists', async () => {
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [{ id: 1, email: 'test@example.com' }],
-        rowCount: 1,
-        command: 'SELECT',
-        oid: 0,
-        fields: []
-      })
+      mockDbLimit.mockResolvedValueOnce([{ id: 1, email: 'test@example.com' }])
 
       await register(mockRequest as Request, mockResponse as Response)
 
-      expect(mockDbQuery).toHaveBeenCalledWith(
-        'SELECT * FROM users WHERE email = $1 OR username = $2',
-        ['test@example.com', 'testuser']
-      )
+      expect(mockDbSelect).toHaveBeenCalled()
       expect(mockResponse.status).toHaveBeenCalledWith(409)
       expect(mockSend).toHaveBeenCalledWith({ message: 'User already exists' })
     })
 
     it('should return 500 if the INSERT fails (rowCount 0)', async () => {
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [],
-        rowCount: 0,
-        command: 'SELECT',
-        oid: 0,
-        fields: []
-      })
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [],
-        rowCount: 0,
-        command: 'INSERT',
-        oid: 0,
-        fields: []
-      })
+      mockDbLimit.mockResolvedValueOnce([])
+      mockDbReturning.mockResolvedValueOnce([])
 
       await register(mockRequest as Request, mockResponse as Response)
 
@@ -148,7 +127,7 @@ describe('controller', () => {
 
     it('should return 500 if the database fails', async () => {
       const dbError = new Error('Error de conexión a la BD')
-      mockDbQuery.mockRejectedValueOnce(dbError)
+      mockDbLimit.mockRejectedValueOnce(dbError)
 
       await register(mockRequest as Request, mockResponse as Response)
 

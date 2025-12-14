@@ -1,20 +1,14 @@
 import type { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import j from 'jsonwebtoken'
+import { eq } from 'drizzle-orm'
 
-import db from '../../db'
+import { db } from '../../db'
+import { users } from '../../db/schema'
 
 interface LoginRequestBody {
   email: string
   password: string
-}
-
-interface UserFromDB {
-  id: number
-  email: string
-  username: string
-  password_hash: string
-  plan: string
 }
 
 const login = async (req: Request, res: Response) => {
@@ -25,15 +19,15 @@ const login = async (req: Request, res: Response) => {
   }
 
   try {
-    const checkUser = await db.query<UserFromDB>('SELECT * FROM users WHERE email = $1', [email])
+    const checkUser = await db.select().from(users).where(eq(users.email, email)).limit(1)
 
-    if (checkUser.rows.length < 1) {
+    if (checkUser.length < 1 || !checkUser[0]) {
       return res.status(404).send({ message: 'User not found' })
     }
 
-    const user = checkUser.rows[0] as UserFromDB
+    const user = checkUser[0]
 
-    const rawPassword = await bcrypt.compare(password, user.password_hash)
+    const rawPassword = await bcrypt.compare(password, user.passwordHash)
 
     if (!rawPassword) {
       return res.status(401).send({ message: 'Invalid credentials' })
