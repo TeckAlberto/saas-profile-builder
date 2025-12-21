@@ -28,7 +28,7 @@ export default tseslint.config(
   configPrettier,
 
   {
-    files: ['src/**/*.{ts,js}', 'test/**/*.ts'],
+    files: ['src/**/*.{ts,js}', 'test/**/*.ts', 'scripts/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.node,

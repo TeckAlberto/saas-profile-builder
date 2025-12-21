@@ -4,8 +4,10 @@
   "main": "dist/index.js",
   "type": "module",
   "engines": {
-    "node": "22.x"
+    "node": "22.x",
+    "pnpm": "10.x"
   },
+  "packageManager": "pnpm@10.25.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -13,6 +15,11 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",
+    "drizzle:generate": "drizzle-kit generate",
+    "drizzle:migrate": "drizzle-kit migrate",
+    "drizzle:studio": "drizzle-kit studio",
+    "db:reset": "drizzle-kit drop --force && drizzle-kit migrate",
+    "db:seed": "tsx scripts/seed.ts",
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage"
@@ -21,7 +28,7 @@
     "@types/cors": "^2.8.19",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3"
@@ -37,6 +44,8 @@
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "@vitest/coverage-v8": "4.0.6",
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",

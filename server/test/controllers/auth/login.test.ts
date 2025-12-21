@@ -1,32 +1,36 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { type Request, type Response } from 'express'
-import bcrypt from 'bcryptjs'
-import j from 'jsonwebtoken'
 
-import db from '../../../src/db'
 import login from '../../../src/controllers/auth/login'
 
+const mockDbSelect = vi.hoisted(() => vi.fn())
+const mockBcryptCompare = vi.hoisted(() => vi.fn())
+const mockJwtSign = vi.hoisted(() => vi.fn())
+
 vi.mock('../../../src/db', () => ({
-  default: {
-    query: vi.fn()
+  db: {
+    select: mockDbSelect
+  },
+  pool: {
+    end: vi.fn()
   }
 }))
 
 vi.mock('bcryptjs', () => ({
   default: {
-    compare: vi.fn(() => Promise.resolve(true))
+    compare: mockBcryptCompare
   }
 }))
 
 vi.mock('jsonwebtoken', () => ({
   default: {
-    sign: vi.fn(() => 'mocked_jwt_token')
+    sign: mockJwtSign
   }
 }))
 
-const mockDbQuery = vi.spyOn(db, 'query')
-const mockBcryptCompare = vi.spyOn(bcrypt, 'compare')
-const mockJwtSign = vi.spyOn(j, 'sign')
+const mockDbFrom = vi.fn()
+const mockDbWhere = vi.fn()
+const mockDbLimit = vi.fn()
 
 let mockRequest: Partial<Request>
 let mockResponse: Partial<Response>
@@ -35,6 +39,12 @@ let mockSend: Mock<(body: unknown) => Response>
 
 beforeEach(() => {
   vi.clearAllMocks()
+
+  mockDbSelect.mockReturnValue({ from: mockDbFrom })
+  mockDbFrom.mockReturnValue({ where: mockDbWhere })
+  mockDbWhere.mockReturnValue({ limit: mockDbLimit })
+  mockBcryptCompare.mockResolvedValue(true)
+  mockJwtSign.mockReturnValue('mocked_jwt_token')
 
   mockResponse = {} as Partial<Response>
 
@@ -60,8 +70,9 @@ describe('controller', () => {
   describe('login', () => {
     it('should log in a user successfully', async () => {
       const existingUser = {
+        id: 1,
         email: 'test@example.com',
-        password_hash: 'mocked_hashed_password'
+        passwordHash: 'mocked_hashed_password'
       }
 
       const successfulLoginResponse = {
@@ -69,26 +80,16 @@ describe('controller', () => {
         token: 'mocked_jwt_token'
       }
 
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [existingUser],
-        rowCount: 1,
-        command: 'SELECT',
-        oid: 0,
-        fields: []
-      })
+      mockDbLimit.mockResolvedValueOnce([existingUser])
 
       await login(mockRequest as Request, mockResponse as Response)
 
-      expect(mockDbQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE email = $1', [
-        'test@example.com'
-      ])
+      expect(mockDbSelect).toHaveBeenCalled()
 
       expect(mockBcryptCompare).toHaveBeenCalledWith('password123', 'mocked_hashed_password')
-      expect(mockJwtSign).toHaveBeenCalledWith(
-        { userId: undefined },
-        process.env.JWT_SECRET as string,
-        { expiresIn: '1h' }
-      )
+      expect(mockJwtSign).toHaveBeenCalledWith({ userId: 1 }, process.env.JWT_SECRET as string, {
+        expiresIn: '1h'
+      })
 
       expect(mockResponse.status).toHaveBeenCalledWith(200)
       expect(mockSend).toHaveBeenCalledWith(successfulLoginResponse)
@@ -107,19 +108,11 @@ describe('controller', () => {
     })
 
     it('should return 404 if the user does not exist', async () => {
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [],
-        rowCount: 0,
-        command: 'SELECT',
-        oid: 0,
-        fields: []
-      })
+      mockDbLimit.mockResolvedValueOnce([])
 
       await login(mockRequest as Request, mockResponse as Response)
 
-      expect(mockDbQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE email = $1', [
-        'test@example.com'
-      ])
+      expect(mockDbSelect).toHaveBeenCalled()
 
       expect(mockResponse.status).toHaveBeenCalledWith(404)
       expect(mockSend).toHaveBeenCalledWith({ message: 'User not found' })
@@ -129,23 +122,15 @@ describe('controller', () => {
       const existingUser = {
         id: 1,
         email: 'test@example.com',
-        password_hash: 'mocked_hashed_password'
+        passwordHash: 'mocked_hashed_password'
       }
 
-      mockDbQuery.mockResolvedValueOnce({
-        rows: [existingUser],
-        rowCount: 1,
-        command: 'SELECT',
-        oid: 0,
-        fields: []
-      })
-      mockBcryptCompare.mockResolvedValueOnce()
+      mockDbLimit.mockResolvedValueOnce([existingUser])
+      mockBcryptCompare.mockResolvedValueOnce(false)
 
       await login(mockRequest as Request, mockResponse as Response)
 
-      expect(mockDbQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE email = $1', [
-        'test@example.com'
-      ])
+      expect(mockDbSelect).toHaveBeenCalled()
 
       expect(mockBcryptCompare).toHaveBeenCalledWith('password123', 'mocked_hashed_password')
 
@@ -154,13 +139,11 @@ describe('controller', () => {
     })
 
     it('should return 500 if there is a database error', async () => {
-      mockDbQuery.mockRejectedValueOnce(new Error('Database error'))
+      mockDbLimit.mockRejectedValueOnce(new Error('Database error'))
 
       await login(mockRequest as Request, mockResponse as Response)
 
-      expect(mockDbQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE email = $1', [
-        'test@example.com'
-      ])
+      expect(mockDbSelect).toHaveBeenCalled()
 
       expect(mockResponse.status).toHaveBeenCalledWith(500)
       expect(mockSend).toHaveBeenCalledWith({ message: 'Internal server error' })

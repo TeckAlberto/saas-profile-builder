@@ -1,15 +1,11 @@
-import dotenv from 'dotenv'
-import { Pool, type QueryResult, type QueryResultRow } from 'pg'
+import 'dotenv/config'
+import { Pool } from 'pg'
+import { drizzle } from 'drizzle-orm/node-postgres'
 
-// Carga las variables de entorno del archivo .env
-dotenv.config()
+import * as schema from './schema'
 
 const pool = new Pool({
-  host: process.env.PGHOST,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  port: Number(process.env.PGPORT)
+  connectionString: process.env.DATABASE_URL
 })
 
 pool.on('error', (err) => {
@@ -17,13 +13,5 @@ pool.on('error', (err) => {
   process.exit(-1)
 })
 
-export default {
-  query: <T extends QueryResultRow>(
-    text: string,
-    params?: (string | number | boolean)[]
-  ): Promise<QueryResult<T>> => {
-    // 2. Define el tipo de retorno
-    // 3. Pasa el genérico <T> al pool.query real
-    return pool.query<T>(text, params)
-  }
-}
+export const db = drizzle(pool, { schema })
+export { pool }
