@@ -6,7 +6,10 @@ import App from './App'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+
 import { AuthLayout } from './components/layout/AuthLayout'
+import { ProtectedRoute } from './layout/ProtectedRoute'
+import DashboardPage from './pages/DashboardPage'
 
 const router = createBrowserRouter([
   {
@@ -28,6 +31,15 @@ const router = createBrowserRouter([
           {
             path: 'register',
             element: <RegisterPage />
+          }
+        ]
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: 'dashboard',
+            element: <DashboardPage />
           }
         ]
       }

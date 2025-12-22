@@ -129,7 +129,12 @@ describe('Auth API', () => {
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         message: 'Login successful',
-        token: 'mocked_jwt_token'
+        token: 'mocked_jwt_token',
+        user: {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com'
+        }
       })
 
       expect(mockDbSelect).toHaveBeenCalled()

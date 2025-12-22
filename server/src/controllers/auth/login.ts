@@ -34,10 +34,18 @@ const login = async (req: Request, res: Response) => {
     }
 
     const token = j.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
-      expiresIn: '1h'
+      expiresIn: '2h'
     })
 
-    res.status(200).send({ message: 'Login successful', token })
+    res.status(200).send({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    })
   } catch (error) {
     console.error('Error in login controller:', (error as Error).message)
 

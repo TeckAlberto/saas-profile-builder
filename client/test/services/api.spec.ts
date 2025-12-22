@@ -8,7 +8,7 @@ describe('api service', () => {
     vi.clearAllMocks()
   })
 
-  it('makes a POST request with correct parameters', async () => {
+  it('should make a POST request with correct parameters', async () => {
     const mockResponse = { success: true }
     ;(globalThis.fetch as Mock).mockResolvedValue({
       ok: true,
@@ -27,7 +27,7 @@ describe('api service', () => {
     expect(result).toEqual(mockResponse)
   })
 
-  it('throws an error when response is not ok', async () => {
+  it('should throw an error when response is not ok', async () => {
     const errorMessage = 'Bad Request'
     ;(globalThis.fetch as Mock).mockResolvedValue({
       ok: false,
@@ -37,7 +37,7 @@ describe('api service', () => {
     await expect(api.post('/test-url', {})).rejects.toThrow(errorMessage)
   })
 
-  it('throws a default error message when no message is provided', async () => {
+  it('should throw a default error message when no message is provided', async () => {
     ;(globalThis.fetch as Mock).mockResolvedValue({
       ok: false,
       json: async () => ({})

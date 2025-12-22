@@ -5,10 +5,16 @@ import { FormRow } from '../components/ui/FormRow'
 import { MailIcon, LockIcon } from '../components/icons/'
 import { AuthHeader } from '../components/ui/AuthHeader'
 import { api } from '../services/api'
+import { useAuthStore } from '../store/authStore'
 
 interface ILoginResponse {
   message: string
   token: string
+  user: {
+    id: number
+    username: string
+    email: string
+  }
 }
 
 interface IFieldConfig {
@@ -44,6 +50,8 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const login = useAuthStore((state) => state.login)
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -71,7 +79,8 @@ export default function LoginPage() {
     try {
       const data = await api.post<ILoginResponse>('/api/auth/login', formData)
 
-      localStorage.setItem('token', data.token)
+      login(data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
 
       navigate('/dashboard')
     } catch (error) {
@@ -83,10 +92,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <AuthHeader
-        title="Login"
-        subtitle="Welcome back — sign in to access your account."
-      />
+      <AuthHeader title="Login" subtitle="Welcome back — sign in to access your account." />
       <form className="p-8 space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-2">
           {formFields.map(({ name, label, type, placeholder, icon }) => (

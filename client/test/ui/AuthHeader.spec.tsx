@@ -4,12 +4,12 @@ import { AuthHeader } from '../../src/components/ui/AuthHeader'
 import '@testing-library/jest-dom'
 
 describe('AuthHeader', () => {
-  it('renders title and subtitle correctly', () => {
+  it('should render title and subtitle correctly', () => {
     const title = 'Welcome Back'
     const subtitle = 'Please sign in to continue'
-    
+
     render(<AuthHeader title={title} subtitle={subtitle} />)
-    
+
     expect(screen.getByText(title)).toBeInTheDocument()
     expect(screen.getByText(subtitle)).toBeInTheDocument()
   })
