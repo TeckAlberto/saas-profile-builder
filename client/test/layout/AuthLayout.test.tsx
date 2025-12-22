@@ -4,9 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { AuthLayout } from '../../src/components/layout/AuthLayout'
 import '@testing-library/jest-dom'
 
-
 describe('AuthLayout Component', () => {
-  
   it('should render the child content via Outlet', () => {
     render(
       <MemoryRouter initialEntries={['/']}>

@@ -109,11 +109,7 @@ export default function RegisterPage() {
         <div className="space-y-2">
           {formFields.map((field, index) => (
             <div key={field.name}>
-              <FormRow
-                {...field}
-                value={formData[field.name]}
-                onChange={handleChange}
-              />
+              <FormRow {...field} value={formData[field.name]} onChange={handleChange} />
 
               {index < formFields.length - 1 && (
                 <div className="border-t border-slate-100 mx-2 my-1"></div>

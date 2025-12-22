@@ -72,12 +72,18 @@ describe('controller', () => {
       const existingUser = {
         id: 1,
         email: 'test@example.com',
-        passwordHash: 'mocked_hashed_password'
+        passwordHash: 'mocked_hashed_password',
+        username: 'testuser'
       }
 
       const successfulLoginResponse = {
         message: 'Login successful',
-        token: 'mocked_jwt_token'
+        token: 'mocked_jwt_token',
+        user: {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com'
+        }
       }
 
       mockDbLimit.mockResolvedValueOnce([existingUser])
@@ -88,7 +94,7 @@ describe('controller', () => {
 
       expect(mockBcryptCompare).toHaveBeenCalledWith('password123', 'mocked_hashed_password')
       expect(mockJwtSign).toHaveBeenCalledWith({ userId: 1 }, process.env.JWT_SECRET as string, {
-        expiresIn: '1h'
+        expiresIn: '2h'
       })
 
       expect(mockResponse.status).toHaveBeenCalledWith(200)

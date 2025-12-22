@@ -4,7 +4,7 @@ import HomePage from '../../src/pages/HomePage'
 import '@testing-library/jest-dom'
 
 describe('HomePage', () => {
-  it('renders correctly', () => {
+  it('should render correctly', () => {
     render(<HomePage />)
     expect(screen.getByText('HomePage')).toBeInTheDocument()
   })
