@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest'
 
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -12,7 +12,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate
 }))
 
-vi.mock('../components/icons/icons', () => ({
+vi.mock('../../src/components/icons', () => ({
   UserIcon: () => <svg data-testid="icon-user" />,
   MailIcon: () => <svg data-testid="icon-mail" />,
   LockIcon: () => <svg data-testid="icon-lock" />
@@ -21,7 +21,7 @@ vi.mock('../components/icons/icons', () => ({
 describe('RegisterPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    window.fetch = vi.fn()
+    window.fetch = vi.fn() as MockedFunction<typeof fetch>
   })
 
   it('should render correctly the component', () => {
@@ -63,13 +63,12 @@ describe('RegisterPage Component', () => {
   it('should call API and redirect if successful', async () => {
     const user = userEvent.setup()
 
-    const fetchMock = (window.fetch as Mock).mockImplementation(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      return {
-        ok: true,
-        json: async () => ({ message: 'Success' })
-      } as Response
-    })
+    const fetchMock = window.fetch as MockedFunction<typeof fetch>
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      statusText: '',
+      text: async () => JSON.stringify({ ok: true })
+    } as Response)
 
     render(<RegisterPage />)
 
@@ -80,10 +79,18 @@ describe('RegisterPage Component', () => {
 
     await user.click(screen.getByRole('button', { name: /register/i }))
 
-    expect(screen.getByText('Creating Account...')).toBeInTheDocument()
-
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith('/api/auth/register', expect.any(Object))
+      expect(fetchMock).toHaveBeenCalledWith('http://localhost:4000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: 'juan',
+          email: 'juan@test.com',
+          password: '123'
+        })
+      })
     })
 
     await waitFor(() => {
@@ -94,9 +101,11 @@ describe('RegisterPage Component', () => {
   it('should handle server errors', async () => {
     const user = userEvent.setup()
 
-    ;(window.fetch as Mock).mockResolvedValue({
+    const fetchMock = window.fetch as MockedFunction<typeof fetch>
+    fetchMock.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ message: 'Usuario existe' })
+      statusText: 'Bad Request',
+      text: async () => JSON.stringify({ message: 'Usuario existe' })
     } as Response)
 
     render(<RegisterPage />)

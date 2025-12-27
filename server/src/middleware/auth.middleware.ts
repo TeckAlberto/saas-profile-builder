@@ -12,6 +12,11 @@ interface JwtPayload {
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (req.method === 'OPTIONS') {
+    next()
+    return
+  }
+
   const token = req.headers.authorization?.split(' ')[1]
 
   if (!token) {

@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
-import { api } from '../../src/services/api'
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest'
+import { post } from '../../src/services/api'
 
-globalThis.fetch = vi.fn()
+const mockFetch = vi.fn() as MockedFunction<typeof fetch>
+globalThis.fetch = mockFetch
 
 describe('api service', () => {
   beforeEach(() => {
@@ -10,14 +11,15 @@ describe('api service', () => {
 
   it('should make a POST request with correct parameters', async () => {
     const mockResponse = { success: true }
-    ;(globalThis.fetch as Mock).mockResolvedValue({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse
-    })
+      statusText: '',
+      text: async () => JSON.stringify(mockResponse)
+    } as Response)
 
-    const result = await api.post('/test-url', { key: 'value' })
+    const result = await post('/test-url', { key: 'value' })
 
-    expect(globalThis.fetch).toHaveBeenCalledWith('/test-url', {
+    expect(mockFetch).toHaveBeenCalledWith('/test-url', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -29,20 +31,22 @@ describe('api service', () => {
 
   it('should throw an error when response is not ok', async () => {
     const errorMessage = 'Bad Request'
-    ;(globalThis.fetch as Mock).mockResolvedValue({
+    mockFetch.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ message: errorMessage })
-    })
+      statusText: 'Bad Request',
+      text: async () => JSON.stringify({ message: errorMessage })
+    } as Response)
 
-    await expect(api.post('/test-url', {})).rejects.toThrow(errorMessage)
+    await expect(post('/test-url', {})).rejects.toThrow(errorMessage)
   })
 
   it('should throw a default error message when no message is provided', async () => {
-    ;(globalThis.fetch as Mock).mockResolvedValue({
+    mockFetch.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({})
-    })
+      statusText: '',
+      text: async () => JSON.stringify({})
+    } as Response)
 
-    await expect(api.post('/test-url', {})).rejects.toThrow('Something went wrong')
+    await expect(post('/test-url', {})).rejects.toThrow('Something went wrong')
   })
 })

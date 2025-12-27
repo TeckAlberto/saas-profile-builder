@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { FormRow } from '../components/ui/FormRow'
 import { UserIcon, MailIcon, LockIcon } from '../components/icons/'
 import { AuthHeader } from '../components/ui/AuthHeader'
-import { api } from '../services/api'
+import { authApi } from '../services/api'
 
 interface IFieldConfig {
   name: string
@@ -87,11 +87,14 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await api.post('/api/auth/register', {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      })
+      await authApi.register(
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        },
+        { baseUrl: 'http://localhost:4000' }
+      )
 
       navigate('/auth/login')
     } catch (err) {

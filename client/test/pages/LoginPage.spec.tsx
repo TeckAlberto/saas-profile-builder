@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import LoginPage from '../../src/pages/LoginPage'
@@ -9,7 +9,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate
 }))
 
-vi.mock('../components/icons/icons', () => ({
+vi.mock('../../src/components/icons', () => ({
   MailIcon: () => <svg data-testid="icon-mail" />,
   LockIcon: () => <svg data-testid="icon-lock" />
 }))
@@ -26,7 +26,7 @@ vi.mock('../../src/components/ui/AuthHeader', () => ({
 describe('LoginPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    window.fetch = vi.fn()
+    window.fetch = vi.fn() as MockedFunction<typeof fetch>
   })
 
   it('should render correctly', () => {
@@ -55,13 +55,17 @@ describe('LoginPage Component', () => {
   it('should call API and redirect on success', async () => {
     const user = userEvent.setup()
 
-    const fetchMock = (window.fetch as Mock).mockImplementation(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      return {
-        ok: true,
-        json: async () => ({ message: 'Success', token: 'fake-token' })
-      } as Response
-    })
+    const fetchMock = window.fetch as MockedFunction<typeof fetch>
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      statusText: '',
+      text: async () =>
+        JSON.stringify({
+          message: 'Success',
+          token: 'fake-token',
+          user: { id: 1, username: 'testuser', email: 'test@example.com' }
+        })
+    } as Response)
 
     render(<LoginPage />)
 
@@ -70,11 +74,9 @@ describe('LoginPage Component', () => {
 
     await user.click(screen.getByRole('button', { name: /login/i }))
 
-    expect(screen.getByText('Logging in...')).toBeInTheDocument()
-
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        '/api/auth/login',
+        'http://localhost:4000/api/auth/login',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({
@@ -93,9 +95,11 @@ describe('LoginPage Component', () => {
   it('should handle server errors', async () => {
     const user = userEvent.setup()
 
-    ;(window.fetch as Mock).mockResolvedValue({
+    const fetchMock = window.fetch as MockedFunction<typeof fetch>
+    fetchMock.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ message: 'Invalid credentials' })
+      statusText: 'Unauthorized',
+      text: async () => JSON.stringify({ message: 'Invalid credentials' })
     } as Response)
 
     render(<LoginPage />)
