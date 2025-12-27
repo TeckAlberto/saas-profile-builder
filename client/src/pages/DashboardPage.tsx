@@ -5,6 +5,7 @@ import { useLinks } from '../hooks/useLink'
 import SummaryCard from '../components/ui/SummaryCard'
 import LinksList from '../components/ui/LinksList'
 import AddLinkModal from '../components/ui/AddLinkModal'
+import DeleteLinkModal from '../components/ui/DeleteLinkModal'
 import type { CreateLinkRequest } from '../services/api'
 
 type StoredUser = {
@@ -38,9 +39,13 @@ export default function DashboardPage() {
 
   const user = getStoredUser()
 
-  const { addLink, links } = useLinks()
+  const { addLink, links, deleteLink } = useLinks()
 
   const [showModal, setShowModal] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number
+    title: string
+  } | null>(null)
   const [formError, setFormError] = useState('')
   const [newLink, setNewLink] = useState({ title: '', url: '' })
   const [copied, setCopied] = useState(false)
@@ -86,6 +91,16 @@ export default function DashboardPage() {
     setShowModal(true)
   }
 
+  const requestRemoveLink = (link: { id: number; title: string }) => {
+    setDeleteTarget({ id: link.id, title: link.title })
+  }
+
+  const handleConfirmRemove = async () => {
+    if (!deleteTarget) return
+    await deleteLink(deleteTarget.id)
+    setDeleteTarget(null)
+  }
+
   const handleAddLink = () => {
     setFormError('')
 
@@ -125,7 +140,7 @@ export default function DashboardPage() {
         canCopy={Boolean(user?.username)}
       />
 
-      <LinksList links={links} onAddLink={openAddModal} />
+      <LinksList links={links} onAddLink={openAddModal} onRequestRemove={requestRemoveLink} />
 
       <AddLinkModal
         isOpen={showModal}
@@ -134,6 +149,13 @@ export default function DashboardPage() {
         onClose={() => setShowModal(false)}
         onSubmit={handleAddLink}
         onChange={setNewLink}
+      />
+
+      <DeleteLinkModal
+        isOpen={Boolean(deleteTarget)}
+        linkTitle={deleteTarget?.title ?? ''}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmRemove}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-export { request, get, post } from './http'
+export { request, get, post, del } from './http'
 export type { ApiOptions } from './http'
 
 export { authApi } from './auth'

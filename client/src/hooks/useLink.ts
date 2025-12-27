@@ -18,7 +18,6 @@ export const useLinks = () => {
     setLoading(true)
     setError(null)
     try {
-      console.log('Fetching links with token:', token)
       const data = await linksApi.list(token, {
         baseUrl: 'http://localhost:4000'
       })
@@ -49,15 +48,40 @@ export const useLinks = () => {
     }
   }
 
+  const deleteLink = async (id: number | string) => {
+    const previousLinks = links.map((link) => link)
+    try {
+      if (!token) {
+        return false
+      }
+
+      setError(null)
+      setLinks((prev) => prev.filter((link) => link.id !== id))
+
+      await linksApi.delete(token, String(id), {
+        baseUrl: 'http://localhost:4000'
+      })
+
+      return true
+    } catch (err) {
+      if (previousLinks) {
+        setLinks(previousLinks)
+      }
+      setError(err instanceof Error ? err.message : 'Error al eliminar link')
+      return false
+    }
+  }
+
   useEffect(() => {
     fetchLinks()
-  }, [fetchLinks])
+  }, [fetchLinks, setLinks])
 
   return {
     links,
     loading,
     error,
     addLink,
+    deleteLink,
     refreshLinks: fetchLinks
   }
 }
