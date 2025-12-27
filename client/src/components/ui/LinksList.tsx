@@ -3,9 +3,10 @@ import type { Link } from '../../services/api'
 type LinksListProps = {
   links: Link[]
   onAddLink: () => void
+  onRequestRemove: (link: Link) => void
 }
 
-export default function LinksList({ links, onAddLink }: LinksListProps) {
+export default function LinksList({ links, onAddLink, onRequestRemove }: LinksListProps) {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
@@ -71,6 +72,7 @@ export default function LinksList({ links, onAddLink }: LinksListProps) {
                 </button>
 
                 <button
+                  onClick={() => onRequestRemove(link)}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition"
                   aria-label={`Remove ${link.title}`}
                 >

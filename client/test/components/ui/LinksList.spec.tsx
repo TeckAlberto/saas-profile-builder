@@ -11,7 +11,7 @@ describe('LinksList', () => {
     const user = userEvent.setup()
     const onAddLink = vi.fn()
 
-    render(<LinksList links={[]} onAddLink={onAddLink} />)
+    render(<LinksList links={[]} onAddLink={onAddLink} onRequestRemove={vi.fn()} />)
 
     expect(screen.getByText('No links yet.')).toBeInTheDocument()
     expect(screen.getByText('0 items')).toBeInTheDocument()
@@ -20,7 +20,10 @@ describe('LinksList', () => {
     expect(onAddLink).toHaveBeenCalledTimes(1)
   })
 
-  it('should render a list of links', () => {
+  it('should render a list of links', async () => {
+    const user = userEvent.setup()
+    const onRequestRemove = vi.fn()
+
     const links: Link[] = [
       {
         id: 1,
@@ -42,12 +45,15 @@ describe('LinksList', () => {
       }
     ]
 
-    render(<LinksList links={links} onAddLink={vi.fn()} />)
+    render(<LinksList links={links} onAddLink={vi.fn()} onRequestRemove={onRequestRemove} />)
 
     expect(screen.getByText('2 items')).toBeInTheDocument()
     expect(screen.getByText('GitHub')).toBeInTheDocument()
     expect(screen.getByText('Portfolio')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^active$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^inactive$/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /remove github/i }))
+    expect(onRequestRemove).toHaveBeenCalledWith(links[0])
   })
 })
