@@ -5,7 +5,7 @@ import login from './login'
 
 const router: Router = Router()
 
-router.post('/register', (req, res) => void register(req, res))
-router.post('/login', (req, res) => void login(req, res))
+router.post('/register', register)
+router.post('/login', login)
 
 export default router

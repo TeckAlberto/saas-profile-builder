@@ -1,6 +1,6 @@
 {
-  "id": "c2bc5553-11eb-4471-82da-d4ea936efeba",
-  "prevId": "a567132a-8e30-4764-93e5-f3430be59aa5",
+  "id": "f679fd7c-d69e-472a-bbc9-63114939271c",
+  "prevId": "c2bc5553-11eb-4471-82da-d4ea936efeba",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -91,6 +91,20 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {
