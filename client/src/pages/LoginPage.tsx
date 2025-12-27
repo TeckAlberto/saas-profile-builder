@@ -4,18 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { FormRow } from '../components/ui/FormRow'
 import { MailIcon, LockIcon } from '../components/icons/'
 import { AuthHeader } from '../components/ui/AuthHeader'
-import { api } from '../services/api'
+import { authApi } from '../services/api'
 import { useAuthStore } from '../store/authStore'
-
-interface ILoginResponse {
-  message: string
-  token: string
-  user: {
-    id: number
-    username: string
-    email: string
-  }
-}
 
 interface IFieldConfig {
   name: string
@@ -77,7 +67,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const data = await api.post<ILoginResponse>('/api/auth/login', formData)
+      const data = await authApi.login(formData, { baseUrl: 'http://localhost:4000' })
 
       login(data.token)
       localStorage.setItem('user', JSON.stringify(data.user))

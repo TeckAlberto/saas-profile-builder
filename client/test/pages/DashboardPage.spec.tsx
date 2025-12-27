@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
 import DashboardPage from '../../src/pages/DashboardPage'
+import type { Link } from '../../src/services/api'
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', () => ({
@@ -11,9 +12,19 @@ vi.mock('react-router-dom', () => ({
 }))
 
 const mockLogout = vi.fn()
+const mockAddLink = vi.fn()
+let mockLinks: Link[] = []
+
 vi.mock('../../src/store/authStore', () => ({
   useAuthStore: (selector: (state: { logout: () => void }) => unknown) =>
     selector({ logout: mockLogout })
+}))
+
+vi.mock('../../src/hooks/useLink', () => ({
+  useLinks: () => ({
+    addLink: mockAddLink,
+    links: mockLinks
+  })
 }))
 
 describe('DashboardPage Component', () => {
@@ -21,6 +32,7 @@ describe('DashboardPage Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockLinks = []
     localStorage.clear()
     localStorage.setItem(
       'user',
@@ -73,7 +85,7 @@ describe('DashboardPage Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login')
   })
 
-  it('should add, toggle, and remove a link with validation', async () => {
+  it('should validate and submit a new link', async () => {
     const user = userEvent.setup()
 
     render(<DashboardPage />)
@@ -97,16 +109,9 @@ describe('DashboardPage Component', () => {
     await user.click(screen.getByRole('button', { name: /^add$/i }))
 
     expect(screen.queryByRole('dialog', { name: /add link/i })).not.toBeInTheDocument()
-
-    expect(screen.getByText('Instagram')).toBeInTheDocument()
-    expect(screen.getByText('https://instagram.com/jane')).toBeInTheDocument()
-    expect(screen.getByText('1 item')).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /active/i }))
-    expect(screen.getByRole('button', { name: /inactive/i })).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /remove instagram/i }))
-    expect(screen.getByText('No links yet.')).toBeInTheDocument()
-    expect(screen.getByText('0 items')).toBeInTheDocument()
+    expect(mockAddLink).toHaveBeenCalledWith({
+      title: 'Instagram',
+      url: 'https://instagram.com/jane'
+    })
   })
 })

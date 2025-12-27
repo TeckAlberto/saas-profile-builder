@@ -1,19 +1,8 @@
-export const api = {
-  post: async <T>(url: string, body: Record<string, unknown>): Promise<T> => {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    })
+export { request, get, post } from './http'
+export type { ApiOptions } from './http'
 
-    const data = await response.json()
+export { authApi } from './auth'
+export type { LoginRequest, LoginResponse, RegisterRequest } from './auth'
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Something went wrong')
-    }
-
-    return data as T
-  }
-}
+export { linksApi } from './links'
+export type { Link, CreateLinkRequest } from './links'
