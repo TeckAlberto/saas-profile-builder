@@ -13,6 +13,8 @@ vi.mock('react-router-dom', () => ({
 
 const mockLogout = vi.fn()
 const mockAddLink = vi.fn()
+const mockDeleteLink = vi.fn()
+const mockSaveOrder = vi.fn()
 let mockLinks: Link[] = []
 
 vi.mock('../../src/store/authStore', () => ({
@@ -23,7 +25,9 @@ vi.mock('../../src/store/authStore', () => ({
 vi.mock('../../src/hooks/useLink', () => ({
   useLinks: () => ({
     addLink: mockAddLink,
-    links: mockLinks
+    links: mockLinks,
+    deleteLink: mockDeleteLink,
+    saveOrder: mockSaveOrder
   })
 }))
 

@@ -74,4 +74,27 @@ describe('links api', () => {
     })
     expect(result).toEqual(payload)
   })
+
+  it('should save order with auth token', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      statusText: '',
+      text: async () => JSON.stringify({ ok: true })
+    } as Response)
+
+    await linksApi.saveOrder(
+      'token-123',
+      { orderedLinkIds: [{ id: 1, order: 0 }] },
+      { baseUrl: 'http://localhost:4000' }
+    )
+
+    expect(mockFetch).toHaveBeenCalledWith('http://localhost:4000/api/links/order', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer token-123'
+      },
+      body: JSON.stringify({ orderedLinkIds: [{ id: 1, order: 0 }] })
+    })
+  })
 })

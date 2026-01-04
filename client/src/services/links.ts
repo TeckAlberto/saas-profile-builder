@@ -19,11 +19,20 @@ export type CreateLinkRequest = {
   platform?: string
 }
 
+export type SaveOrderRequest = {
+  orderedLinkIds: { id: number; order: number }[]
+}
+
 export const linksApi = {
   list: async (token: string, options?: ApiOptions): Promise<Link[]> =>
     request<Link[]>('GET', '/api/links', undefined, { ...options, token }),
   create: async (token: string, payload: CreateLinkRequest, options?: ApiOptions): Promise<Link> =>
     request<Link>('POST', '/api/links', payload, { ...options, token }),
   delete: async (token: string, id: string, options?: ApiOptions): Promise<Link> =>
-    request<Link>('DELETE', `/api/links/${id}`, undefined, { ...options, token })
+    request<Link>('DELETE', `/api/links/${id}`, undefined, { ...options, token }),
+  saveOrder: async (
+    token: string,
+    payload: SaveOrderRequest,
+    options?: ApiOptions
+  ): Promise<void> => request<void>('PATCH', '/api/links/order', payload, { ...options, token })
 }

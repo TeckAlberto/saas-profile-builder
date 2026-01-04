@@ -15,7 +15,7 @@ const buildUrl = (url: string, baseUrl?: string) => {
 }
 
 export const request = async <T>(
-  method: 'GET' | 'POST' | 'DELETE',
+  method: 'GET' | 'POST' | 'DELETE' | 'PATCH',
   url: string,
   body?: unknown,
   options: ApiOptions = {}
@@ -69,3 +69,6 @@ export const post = async <T>(url: string, body: unknown, options?: ApiOptions):
 
 export const del = async <T>(url: string, options?: ApiOptions): Promise<T> =>
   request<T>('DELETE', url, undefined, options)
+
+export const patch = async <T>(url: string, body: unknown, options?: ApiOptions): Promise<T> =>
+  request<T>('PATCH', url, body, options)

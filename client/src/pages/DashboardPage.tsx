@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
   const user = getStoredUser()
 
-  const { addLink, links, deleteLink } = useLinks()
+  const { addLink, links, deleteLink, saveOrder } = useLinks()
 
   const [showModal, setShowModal] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -128,6 +128,10 @@ export default function DashboardPage() {
     setShowModal(false)
   }
 
+  const handleReorder = (orderedLinks: typeof links) => {
+    void saveOrder(orderedLinks)
+  }
+
   return (
     <div className="space-y-6">
       <SummaryCard
@@ -140,7 +144,12 @@ export default function DashboardPage() {
         canCopy={Boolean(user?.username)}
       />
 
-      <LinksList links={links} onAddLink={openAddModal} onRequestRemove={requestRemoveLink} />
+      <LinksList
+        links={links}
+        onAddLink={openAddModal}
+        onRequestRemove={requestRemoveLink}
+        onReorder={handleReorder}
+      />
 
       <AddLinkModal
         isOpen={showModal}
