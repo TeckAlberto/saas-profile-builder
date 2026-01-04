@@ -11,7 +11,9 @@ describe('LinksList', () => {
     const user = userEvent.setup()
     const onAddLink = vi.fn()
 
-    render(<LinksList links={[]} onAddLink={onAddLink} onRequestRemove={vi.fn()} />)
+    render(
+      <LinksList links={[]} onAddLink={onAddLink} onRequestRemove={vi.fn()} onReorder={vi.fn()} />
+    )
 
     expect(screen.getByText('No links yet.')).toBeInTheDocument()
     expect(screen.getByText('0 items')).toBeInTheDocument()
@@ -45,7 +47,14 @@ describe('LinksList', () => {
       }
     ]
 
-    render(<LinksList links={links} onAddLink={vi.fn()} onRequestRemove={onRequestRemove} />)
+    render(
+      <LinksList
+        links={links}
+        onAddLink={vi.fn()}
+        onRequestRemove={onRequestRemove}
+        onReorder={vi.fn()}
+      />
+    )
 
     expect(screen.getByText('2 items')).toBeInTheDocument()
     expect(screen.getByText('GitHub')).toBeInTheDocument()

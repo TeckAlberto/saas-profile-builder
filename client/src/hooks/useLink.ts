@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { linksApi } from '../services/api'
-import type { Link, CreateLinkRequest } from '../services/api'
+import type { Link, CreateLinkRequest, SaveOrderRequest } from '../services/api'
 import { useAuthStore } from '../store/authStore'
 
 export const useLinks = () => {
@@ -72,6 +72,40 @@ export const useLinks = () => {
     }
   }
 
+  const saveOrder = async (orderedLinks: Link[]) => {
+    const previousLinks = links.map((link) => link)
+
+    if (!token) {
+      return false
+    }
+
+    const payload: SaveOrderRequest = {
+      orderedLinkIds: orderedLinks.map((link, index) => ({
+        id: link.id,
+        order: index
+      }))
+    }
+
+    setError(null)
+    setLinks(
+      orderedLinks.map((link, index) => ({
+        ...link,
+        order: index
+      }))
+    )
+
+    try {
+      await linksApi.saveOrder(token, payload, {
+        baseUrl: 'http://localhost:4000'
+      })
+      return true
+    } catch (err) {
+      setLinks(previousLinks)
+      setError(err instanceof Error ? err.message : 'Error al guardar orden de links')
+      return false
+    }
+  }
+
   useEffect(() => {
     fetchLinks()
   }, [fetchLinks, setLinks])
@@ -82,6 +116,7 @@ export const useLinks = () => {
     error,
     addLink,
     deleteLink,
+    saveOrder,
     refreshLinks: fetchLinks
   }
 }

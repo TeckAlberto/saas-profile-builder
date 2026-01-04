@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest'
-import { get, post } from '../../src/services/http'
+import { get, post, patch } from '../../src/services/http'
 
 const mockFetch = vi.fn() as MockedFunction<typeof fetch>
 globalThis.fetch = mockFetch
@@ -68,5 +68,25 @@ describe('http service', () => {
     } as Response)
 
     await expect(get('/api/test')).rejects.toThrow('Empty response from server')
+  })
+
+  it('should perform a PATCH request with payload', async () => {
+    const payload = { ok: true }
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      statusText: '',
+      text: async () => JSON.stringify(payload)
+    } as Response)
+
+    const result = await patch('/api/links/order', { orderedLinkIds: [] })
+
+    expect(mockFetch).toHaveBeenCalledWith('/api/links/order', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderedLinkIds: [] })
+    })
+    expect(result).toEqual(payload)
   })
 })
