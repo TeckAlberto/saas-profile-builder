@@ -3,7 +3,7 @@ import { type Response } from 'express'
 
 import create from '../../../src/controllers/links/create'
 import { links } from '../../../src/db/schema'
-import type { AuthRequest } from '../../../src/middleware/auth.middleware'
+import type { AuthRequest } from '../../../src/middleware/auth'
 
 const mockDbInsert = vi.hoisted(() => vi.fn())
 
