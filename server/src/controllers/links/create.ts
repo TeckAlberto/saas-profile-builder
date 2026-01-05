@@ -2,7 +2,7 @@ import type { Response } from 'express'
 
 import { db } from '../../db'
 import { links } from '../../db/schema'
-import type { AuthRequest } from '../../middleware/auth.middleware'
+import type { AuthRequest } from '../../middleware/auth'
 
 interface CreateLinkBody {
   platform?: string

@@ -1,7 +1,7 @@
 import type { Response } from 'express'
 import { and, eq } from 'drizzle-orm'
 
-import type { AuthRequest } from '../../middleware/auth.middleware'
+import type { AuthRequest } from '../../middleware/auth'
 import { links } from '../../db/schema'
 import { db } from '../../db'
 

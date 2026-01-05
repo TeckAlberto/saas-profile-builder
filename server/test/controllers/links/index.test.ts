@@ -28,7 +28,7 @@ describe('controller router', () => {
   })
 
   it('should wire GET / with auth middleware', async () => {
-    vi.doMock('../../../src/middleware/auth.middleware', () => ({
+    vi.doMock('../../../src/middleware/auth', () => ({
       authMiddleware: mockAuthMiddleware
     }))
 

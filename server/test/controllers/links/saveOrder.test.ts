@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { type Response } from 'express'
 
 import saveOrder from '../../../src/controllers/links/saveOrder'
-import type { AuthRequest } from '../../../src/middleware/auth.middleware'
+import type { AuthRequest } from '../../../src/middleware/auth'
 
 const mockDbSelect = vi.hoisted(() => vi.fn())
 const mockDbTransaction = vi.hoisted(() => vi.fn())

@@ -3,7 +3,7 @@ import { asc, eq } from 'drizzle-orm'
 
 import { db } from '../../db'
 import { links } from '../../db/schema'
-import type { AuthRequest } from '../../middleware/auth.middleware'
+import type { AuthRequest } from '../../middleware/auth'
 
 const getByUserId = async (req: AuthRequest, res: Response) => {
   try {
