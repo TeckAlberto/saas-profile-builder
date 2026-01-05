@@ -64,7 +64,7 @@ describe('DashboardPage Component', () => {
 
     render(<DashboardPage />)
 
-    const profileUrlElement = await screen.findByText(/\/u\/jane$/i)
+    const profileUrlElement = await screen.findByText(/\/jane$/i)
     const profileUrl = profileUrlElement.textContent ?? ''
     expect(profileUrl).not.toBe('')
 

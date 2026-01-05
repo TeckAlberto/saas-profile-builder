@@ -66,7 +66,7 @@ export default function DashboardPage() {
       return '-'
     }
 
-    return `${window.location.origin}/u/${encodeURIComponent(username)}`
+    return `${window.location.origin}/${encodeURIComponent(username)}`
   }, [user])
 
   const handleLogout = () => {
@@ -83,6 +83,11 @@ export default function DashboardPage() {
     } catch {
       alert('Could not copy. Please copy it manually.')
     }
+  }
+
+  const handlePreviewProfile = () => {
+    if (!user?.username) return
+    window.open(profileUrl, '_blank', 'noopener,noreferrer')
   }
 
   const openAddModal = () => {
@@ -140,7 +145,7 @@ export default function DashboardPage() {
         onCopy={handleCopyProfileUrl}
         onAddLink={openAddModal}
         onLogout={handleLogout}
-        onPreview={() => alert('TODO: open public preview')}
+        onPreview={handlePreviewProfile}
         canCopy={Boolean(user?.username)}
       />
 

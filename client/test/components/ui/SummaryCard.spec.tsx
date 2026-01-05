@@ -15,7 +15,7 @@ describe('SummaryCard', () => {
 
     render(
       <SummaryCard
-        profileUrl="https://example.com/u/jane"
+        profileUrl="https://example.com/jane"
         copied={false}
         onCopy={onCopy}
         onAddLink={onAddLink}
@@ -26,7 +26,7 @@ describe('SummaryCard', () => {
     )
 
     expect(screen.getByText('Your page')).toBeInTheDocument()
-    expect(screen.getByText('https://example.com/u/jane')).toBeInTheDocument()
+    expect(screen.getByText('https://example.com/jane')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /copy link/i }))
     await user.click(screen.getByRole('button', { name: /add link/i }))
@@ -53,12 +53,13 @@ describe('SummaryCard', () => {
     )
 
     expect(screen.getByRole('button', { name: /copy link/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /preview/i })).toBeDisabled()
   })
 
   it('should show copied state', () => {
     render(
       <SummaryCard
-        profileUrl="https://example.com/u/jane"
+        profileUrl="https://example.com/jane"
         copied={true}
         onCopy={vi.fn()}
         onAddLink={vi.fn()}

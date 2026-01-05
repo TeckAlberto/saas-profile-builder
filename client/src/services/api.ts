@@ -6,3 +6,6 @@ export type { LoginRequest, LoginResponse, RegisterRequest } from './auth'
 
 export { linksApi } from './links'
 export type { Link, CreateLinkRequest, SaveOrderRequest } from './links'
+
+export { usersApi } from './users'
+export type { PublicProfile } from './users'
