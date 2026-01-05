@@ -6,6 +6,7 @@ import App from './App'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import PublicProfilePage from './pages/PublicProfilePage'
 
 import { AuthLayout } from './components/layout/AuthLayout'
 import { ProtectedRoute } from './layout/ProtectedRoute'
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
             element: <DashboardPage />
           }
         ]
+      },
+      {
+        path: ':name',
+        element: <PublicProfilePage />
       }
     ]
   }

@@ -43,8 +43,10 @@ export default function SummaryCard({
 
             <button
               onClick={onPreview}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm
-                         hover:bg-slate-50 transition"
+              className={`rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition ${
+                canCopy ? 'hover:bg-slate-50' : 'opacity-60 cursor-not-allowed'
+              }`}
+              disabled={!canCopy}
             >
               Preview
             </button>
