@@ -49,7 +49,7 @@ function RootLayoutContainer({
   variant: 'public' | 'app' | 'auth'
   children: React.ReactNode
 }) {
-  const base = 'min-h-screen'
+  const base = 'min-h-screen flex flex-col'
   const bg =
     variant === 'public' ? 'bg-slate-50' : variant === 'app' ? 'bg-slate-50' : 'bg-slate-50'
   return <div className={`${base} ${bg}`}>{children}</div>
@@ -68,7 +68,7 @@ export default function App() {
       {isPublic && <PublicHeader />}
       {isApp && <AppHeader />}
 
-      <main className={isApp ? 'mx-auto max-w-5xl px-6 py-8' : ''}>
+      <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-8">
         <Outlet />
       </main>
 

@@ -14,8 +14,6 @@ interface LoginRequestBody {
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body as LoginRequestBody
 
-  console.log('Login attempt for email:', email)
-
   if (!email || !password) {
     return res.status(400).send({ message: 'Email and password are required' })
   }
@@ -37,16 +35,6 @@ const login = async (req: Request, res: Response) => {
 
     const token = j.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
       expiresIn: '2h'
-    })
-
-    console.log({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      }
     })
 
     res.status(200).send({

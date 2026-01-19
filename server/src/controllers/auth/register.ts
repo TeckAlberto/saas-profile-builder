@@ -40,7 +40,6 @@ const register = async (req: Request, res: Response) => {
     if (result.length === 0) {
       return res.status(500).send({ message: 'Error registering user' })
     }
-    console.log('Registering user with email:', email, 'and username:', username)
 
     res.status(201).send(result[0])
   } catch (error) {
